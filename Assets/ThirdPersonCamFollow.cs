@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class ThirdPersonCamFollow : MonoBehaviour {
     public Vector3 offsetPosition;
@@ -13,8 +14,8 @@ public class ThirdPersonCamFollow : MonoBehaviour {
         target = GameObject.FindGameObjectWithTag("Player").transform;
     }
 	
-	// Update is called once per frame
-	void Update ()
+    // Update is called once per frame
+    void Update ()
     {
         transform.position = target.TransformPoint(offsetPosition);
         transform.LookAt(target);
