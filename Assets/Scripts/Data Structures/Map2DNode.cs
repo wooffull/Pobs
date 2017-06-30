@@ -3,14 +3,21 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Map2DNode {
+    private bool connectedWithLeft;
+    private bool connectedWithRight;
+    private bool connectedWithUp;
+    private bool connectedWithDown;
+
     public uint X { get; set; }
     public uint Y { get; set; }
+    public uint Id { get; set; }
+    public MapNodeData Data { get; set; }
     public bool Visited { get; set; }
     public bool Active { get; set; }
-    private bool ConnectedWithLeft { get; set; }
-    private bool ConnectedWithRight { get; set; }
-    private bool ConnectedWithUp { get; set; }
-    private bool ConnectedWithDown { get; set; }
+    public bool ConnectedWithLeft { get { return connectedWithLeft; } }
+    public bool ConnectedWithRight { get { return connectedWithRight; } }
+    public bool ConnectedWithUp { get { return connectedWithUp; } }
+    public bool ConnectedWithDown { get { return connectedWithDown; } }
     public Map2DNode Left { get; set; }
     public Map2DNode Right { get; set; }
     public Map2DNode Up { get; set; }
@@ -68,15 +75,17 @@ public class Map2DNode {
         }
     }
 
-    public Map2DNode(uint x, uint y)
+    public Map2DNode(uint x, uint y, uint id)
     {
         X = x;
         Y = y;
+        Id = id;
+        Data = null;
         Active = false;
-        ConnectedWithLeft = false;
-        ConnectedWithRight = false;
-        ConnectedWithUp = false;
-        ConnectedWithDown = false;
+        connectedWithLeft = false;
+        connectedWithRight = false;
+        connectedWithUp = false;
+        connectedWithDown = false;
 
         Reset();
     }
@@ -90,26 +99,26 @@ public class Map2DNode {
     {
         if (node == Left)
         {
-            node.ConnectedWithRight = true;
-            ConnectedWithLeft = true;
+            node.connectedWithRight = true;
+            connectedWithLeft = true;
         }
         
         if (node == Right)
         {
-            node.ConnectedWithLeft = true;
-            ConnectedWithRight = true;
+            node.connectedWithLeft = true;
+            connectedWithRight = true;
         }
 
         if (node == Up)
         {
-            node.ConnectedWithDown = true;
-            ConnectedWithUp = true;
+            node.connectedWithDown = true;
+            connectedWithUp = true;
         }
 
         if (node == Down)
         {
-            node.ConnectedWithUp = true;
-            ConnectedWithDown = true;
+            node.connectedWithUp = true;
+            connectedWithDown = true;
         }
 
         Active = true;

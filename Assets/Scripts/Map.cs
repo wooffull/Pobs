@@ -159,7 +159,7 @@ public class Map {
 
             for (uint j = 0; j < verticalLength; j++)
             {
-                Nodes[i][j] = new Map2DNode(i, j);
+                Nodes[i][j] = new Map2DNode(i, j, 0);
             }
         }
     }

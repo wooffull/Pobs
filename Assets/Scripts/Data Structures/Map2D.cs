@@ -29,13 +29,15 @@ public class Map2D
     private void InitializeNodes(uint horizontalLength, uint verticalLength)
     {
         Nodes = new Map2DNode[horizontalLength][];
+        uint totalAdded = 0;
         for (uint i = 0; i < horizontalLength; i++)
         {
             Nodes[i] = new Map2DNode[verticalLength];
 
             for (uint j = 0; j < verticalLength; j++)
             {
-                Nodes[i][j] = new Map2DNode(i, j);
+                Nodes[i][j] = new Map2DNode(i, j, totalAdded);
+                totalAdded++;
             }
         }
     }
@@ -70,6 +72,20 @@ public class Map2D
                 {
                     node.Down = Nodes[i][downIndex];
                 }
+            }
+        }
+
+        // Set the start node as the first node
+        StartNode = Nodes[0][0];
+    }
+
+    protected virtual void ResetNodes()
+    {
+        for (int i = 0; i < Nodes.Length; i++)
+        {
+            for (int j = 0; j < Nodes[0].Length; j++)
+            {
+                Nodes[i][j].Reset();
             }
         }
     }

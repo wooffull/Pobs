@@ -21,21 +21,31 @@ public class LevelGenerator : MonoBehaviour {
         );
     }
 
-    public object CreateBridge(float x, float y, float z, float angle)
+    public object CreateBridge(float x, float y, float z, float angle, float scale)
     {
-        return Instantiate(
+        object ret = Instantiate(
             bridgePrefab,
             new Vector3(x, y, z),
             Quaternion.Euler(0, angle, 0)
         );
+        GameObject bridge = (GameObject)ret;
+        Vector3 prevScale = bridge.transform.localScale;
+        bridge.transform.localScale = new Vector3
+        (
+            prevScale.x,
+            prevScale.y,
+            prevScale.z * scale
+        );
+        return ret;
     }
 
 
-    public void GenerateLevel(int horizontalNodeLength = 50, int verticalNodeLength = 50)
+    public void GenerateLevel(uint horizontalNodeLength = 25, uint verticalNodeLength = 25)
     {
-        //ProceduralLevelBinaryTree levelTree = new ProceduralLevelBinaryTree(10);
-        ProceduralLevelMap2D map = new ProceduralLevelMap2D(10, 10);
+        ProceduralLevelMap2D map = new ProceduralLevelMap2D(horizontalNodeLength, verticalNodeLength);
 
+        float nodeDistance = 100;
+        float bridgeOffsetY = -7;
 
         for (int i = 0; i < map.HorizontalLength; i++)
         {
@@ -43,58 +53,54 @@ public class LevelGenerator : MonoBehaviour {
             {
                 Map2DNode n = map.Nodes[i][j];
 
-                CreatePlatform(i * 100, 0, j * 100);
-
-                if (n.Down != null)
-                {
-                    CreateBridge(i * 100, 0, j * 100 + 50, 0);
-                }
-
-                if (n.Right != null)
-                {
-                    CreateBridge(i * 100 + 50, 0, j * 100, 90);
-                }
-            }
-        }
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        player.transform.position = new Vector3
-        (
-            0,
-            100,
-            0
-        );
-    }
-
-
-
-
-
-
-
-    /*public void GenerateLevel(int horizontalNodeLength = 10, int verticalNodeLength = 10)
-    {
-        Map map = new Map(horizontalNodeLength, verticalNodeLength);
-
-        for (int i = 0; i < map.HorizontalLength; i++)
-        {
-            for (int j = 0; j < map.VerticalLength; j++)
-            {
-                MapNode n = map.Nodes[i][j];
+                // Transform the indices to positions that have a hexagonal pattern
+                float x = i * nodeDistance;
+                float z = j * nodeDistance;
+                if (i % 2 == 0) z += nodeDistance * 2 * Mathf.Floor(j / 2);
+                else z += nodeDistance * 2 * Mathf.Floor((j + 1) / 2) - nodeDistance;
 
                 if (n.Active)
                 {
-                    CreatePlatform(i * 100, 0, j * 100);
+                    CreatePlatform(x, 0, z);
+
+                    if (n.ConnectedWithDown)
+                    {
+                        CreateBridge(x, bridgeOffsetY, z + nodeDistance * 0.5f, 0, 1);
+                    }
+
+                    if (n.ConnectedWithRight)
+                    {
+                        float nextX = (i + 1) * nodeDistance;
+                        float nextZ = j * nodeDistance;
+                        if ((i + 1) % 2 == 0) nextZ += nodeDistance * 2 * Mathf.Floor(j / 2);
+                        else nextZ += nodeDistance * 2 * Mathf.Floor((j + 1) / 2) - nodeDistance;
+
+                        float bridgeX = (nextX + x) * 0.5f;
+                        float bridgeZ = (nextZ + z) * 0.5f;
+
+                        Vector3 curPos = new Vector3(x, 0, z);
+                        Vector3 nextPos = new Vector3(nextX, 0, nextZ);
+                        Vector3 direction = nextPos - curPos;
+                        float angle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
+
+                        CreateBridge(bridgeX, bridgeOffsetY, bridgeZ, angle, 1.75f);
+                    }
                 }
             }
         }
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
+        float startX = map.StartNode.X * nodeDistance;
+        float startZ = map.StartNode.Y * nodeDistance;
+
+        if (map.StartNode.X % 2 == 0) startZ += nodeDistance * 2 * Mathf.Floor(map.StartNode.Y / 2);
+        else startZ += nodeDistance * 2 * Mathf.Floor((map.StartNode.Y + 1) / 2) - nodeDistance;
+
         player.transform.position = new Vector3
         (
-            map.StartNode.X * 100,
+            startX,
             100,
-            map.StartNode.Y * 100
+            startZ
         );
-    }*/
+    }
 }
