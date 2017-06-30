@@ -2,24 +2,24 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapNode {
-    public int X { get; set; }
-    public int Y { get; set; }
+public class Map2DNode {
+    public uint X { get; set; }
+    public uint Y { get; set; }
     public bool Visited { get; set; }
     public bool Active { get; set; }
     private bool ConnectedWithLeft { get; set; }
     private bool ConnectedWithRight { get; set; }
     private bool ConnectedWithUp { get; set; }
     private bool ConnectedWithDown { get; set; }
-    public MapNode Left { get; set; }
-    public MapNode Right { get; set; }
-    public MapNode Up { get; set; }
-    public MapNode Down { get; set; }
-    public List<MapNode> AdjacentNodes
+    public Map2DNode Left { get; set; }
+    public Map2DNode Right { get; set; }
+    public Map2DNode Up { get; set; }
+    public Map2DNode Down { get; set; }
+    public List<Map2DNode> AdjacentNodes
     {
         get
         {
-            List<MapNode> adjacentNodes = new List<MapNode>();
+            List<Map2DNode> adjacentNodes = new List<Map2DNode>();
             if (Left != null) adjacentNodes.Add(Left);
             if (Right != null) adjacentNodes.Add(Right);
             if (Up != null) adjacentNodes.Add(Up);
@@ -28,11 +28,11 @@ public class MapNode {
             return adjacentNodes;
         }
     }
-    public List<MapNode> AvailableNodes
+    public List<Map2DNode> AvailableNodes
     {
         get
         {
-            List<MapNode> availableNodes = new List<MapNode>();
+            List<Map2DNode> availableNodes = new List<Map2DNode>();
             if (Left != null && !Left.ConnectedWithRight && !Left.Visited) availableNodes.Add(Left);
             if (Right != null && !Right.ConnectedWithLeft && !Right.Visited) availableNodes.Add(Right);
             if (Up != null && !Up.ConnectedWithDown && !Up.Visited) availableNodes.Add(Up);
@@ -41,11 +41,11 @@ public class MapNode {
             return availableNodes;
         }
     }
-    public List<MapNode> ConnectedNodes
+    public List<Map2DNode> ConnectedNodes
     {
         get
         {
-            List<MapNode> connectedNodes = new List<MapNode>();
+            List<Map2DNode> connectedNodes = new List<Map2DNode>();
             if (Left != null && Left.ConnectedWithRight) connectedNodes.Add(Left);
             if (Right != null && Right.ConnectedWithLeft) connectedNodes.Add(Right);
             if (Up != null && Up.ConnectedWithDown) connectedNodes.Add(Up);
@@ -54,11 +54,11 @@ public class MapNode {
             return connectedNodes;
         }
     }
-    public List<MapNode> ConnectedUnvisistedNodes
+    public List<Map2DNode> ConnectedUnvisistedNodes
     {
         get
         {
-            List<MapNode> connectedUnvisitedNodes = new List<MapNode>();
+            List<Map2DNode> connectedUnvisitedNodes = new List<Map2DNode>();
             if (Left != null && Left.ConnectedWithRight && !Left.Visited) connectedUnvisitedNodes.Add(Left);
             if (Right != null && Right.ConnectedWithLeft && !Right.Visited) connectedUnvisitedNodes.Add(Right);
             if (Up != null && Up.ConnectedWithDown && !Up.Visited) connectedUnvisitedNodes.Add(Up);
@@ -68,7 +68,7 @@ public class MapNode {
         }
     }
 
-    public MapNode(int x, int y)
+    public Map2DNode(uint x, uint y)
     {
         X = x;
         Y = y;
@@ -86,7 +86,7 @@ public class MapNode {
         Visited = false;
     }
 
-    public void Connect(MapNode node)
+    public void Connect(Map2DNode node)
     {
         if (node == Left)
         {

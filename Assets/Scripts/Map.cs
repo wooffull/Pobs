@@ -8,19 +8,23 @@ public class Map {
     private const float SKIP_CONNECTION_PERCENTAGE = 0.85f;
     private const float SKIP_CONNECTION_BACKUP_PERCENTAGE = 0.5f;
 
-    public MapNode[][] Nodes { get; set; }
-    public int HorizontalLength { get; set; }
-    public int VerticalLength { get; set; }
+    private int horizontalLength;
+    private int verticalLength;
 
-    public MapNode StartNode { get; set; }
+    public Map2DNode[][] Nodes { get; set; }
+    public int HorizontalLength { get { return horizontalLength; } }
+    public int VerticalLength { get { return verticalLength; } }
+
+    public Map2DNode StartNode { get; set; }
 
     public Map(int horizontalNodes, int verticalNodes, float connectionPercentage = DEFAULT_CONNECTION_PERCENTAGE)
     {
+
         Assert.IsTrue(horizontalNodes > 0 && verticalNodes > 0);
         Assert.IsTrue(connectionPercentage >= 0 && connectionPercentage <= 1);
 
-        HorizontalLength = horizontalNodes;
-        VerticalLength = verticalNodes;
+        horizontalLength = horizontalNodes;
+        verticalLength = verticalNodes;
 
         // Construct map data from nodes
         InitializeNodes(HorizontalLength, VerticalLength);
@@ -40,11 +44,11 @@ public class Map {
     public void AddConnection()
     {
         bool connectionAdded = false;
-        Stack<MapNode> nodeStack = new Stack<MapNode>();
-        MapNode searchNode;
-        List<MapNode> adjacentNodes;
-        List<MapNode> connectedUnvistedNodes;
-        List<MapNode> availableNodes;
+        Stack<Map2DNode> nodeStack = new Stack<Map2DNode>();
+        Map2DNode searchNode;
+        List<Map2DNode> adjacentNodes;
+        List<Map2DNode> connectedUnvistedNodes;
+        List<Map2DNode> availableNodes;
 
         ResetNodes();
         nodeStack.Push(StartNode);
@@ -76,7 +80,7 @@ public class Map {
             {
                 int nodeIndexToConnect = Random.Range(0, adjacentNodes.Count);
                 Debug.Log("Default add " + nodeIndexToConnect.ToString());
-                MapNode nodeToConnect = adjacentNodes[nodeIndexToConnect];
+                Map2DNode nodeToConnect = adjacentNodes[nodeIndexToConnect];
                 searchNode.Connect(nodeToConnect);
                 connectionAdded = true;
             }
@@ -103,7 +107,7 @@ public class Map {
                     {
                         int nodeIndexToConnect = Random.Range(0, availableNodes.Count);
                         Debug.Log("New add " + availableNodes.Count);
-                        MapNode nodeToConnect = availableNodes[nodeIndexToConnect];
+                        Map2DNode nodeToConnect = availableNodes[nodeIndexToConnect];
                         searchNode.Connect(nodeToConnect);
                         connectionAdded = true;
                     }
@@ -128,7 +132,7 @@ public class Map {
                         {
                             Debug.Log("Proceed..." + connectedUnvistedNodes.Count.ToString() + " " + nodeStack.Count.ToString());
                             int nextNodeIndex = Random.Range(0, connectedUnvistedNodes.Count);
-                            MapNode nextNode = connectedUnvistedNodes[nextNodeIndex];
+                            Map2DNode nextNode = connectedUnvistedNodes[nextNodeIndex];
                             nodeStack.Push(nextNode);
                         }
 
@@ -137,7 +141,7 @@ public class Map {
                         {
                             Debug.Log("Adj...");
                             int nextNodeIndex = Random.Range(0, adjacentNodes.Count);
-                            MapNode nextNode = adjacentNodes[nextNodeIndex];
+                            Map2DNode nextNode = adjacentNodes[nextNodeIndex];
                             nodeStack.Push(nextNode);
                         }
                     }
@@ -148,14 +152,14 @@ public class Map {
 
     private void InitializeNodes(int horizontalLength, int verticalLength)
     {
-        Nodes = new MapNode[horizontalLength][];
-        for (int i = 0; i < horizontalLength; i++)
+        Nodes = new Map2DNode[horizontalLength][];
+        for (uint i = 0; i < horizontalLength; i++)
         {
-            Nodes[i] = new MapNode[verticalLength];
+            Nodes[i] = new Map2DNode[verticalLength];
 
-            for (int j = 0; j < verticalLength; j++)
+            for (uint j = 0; j < verticalLength; j++)
             {
-                Nodes[i][j] = new MapNode(i, j);
+                Nodes[i][j] = new Map2DNode(i, j);
             }
         }
     }
@@ -170,7 +174,7 @@ public class Map {
         {
             for (int j = 0; j < Nodes[0].Length; j++)
             {
-                MapNode node = Nodes[i][j];
+                Map2DNode node = Nodes[i][j];
 
                 int leftIndex = i - 1;
                 int rightIndex = i + 1;
