@@ -3,14 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour {
+    [SerializeField]
     private Object platformPrefab;
-    private Object bridgePrefab;
 
-    void Start()
-    {
-        platformPrefab = Resources.Load("HalfSphere");
-        bridgePrefab = Resources.Load("Bridge");
-    }
+    [SerializeField]
+    private Object bridgePrefab;
 
     public object CreatePlatform(float x, float y, float z)
     {
@@ -34,7 +31,7 @@ public class LevelGenerator : MonoBehaviour {
         (
             prevScale.x,
             prevScale.y,
-            prevScale.z * scale
+            scale
         );
         return ret;
     }
@@ -44,7 +41,8 @@ public class LevelGenerator : MonoBehaviour {
     {
         ProceduralLevelMap2D map = new ProceduralLevelMap2D(horizontalNodeLength, verticalNodeLength);
 
-        float nodeDistance = 100;
+        Bounds bounds = CalculateLocalBounds((GameObject)platformPrefab);
+        float nodeDistance = bounds.size.x * 1.2f;
         float bridgeOffsetY = -7;
 
         for (int i = 0; i < map.HorizontalLength; i++)
@@ -65,7 +63,7 @@ public class LevelGenerator : MonoBehaviour {
 
                     if (n.ConnectedWithDown)
                     {
-                        CreateBridge(x, bridgeOffsetY, z + nodeDistance * 0.5f, 0, 1);
+                        CreateBridge(x, bridgeOffsetY, z + nodeDistance * 0.5f, 0, nodeDistance);
                     }
 
                     if (n.ConnectedWithRight)
@@ -83,7 +81,7 @@ public class LevelGenerator : MonoBehaviour {
                         Vector3 direction = nextPos - curPos;
                         float angle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
 
-                        CreateBridge(bridgeX, bridgeOffsetY, bridgeZ, angle, 1.75f);
+                        CreateBridge(bridgeX, bridgeOffsetY, bridgeZ, angle, nodeDistance * Mathf.Sqrt(2));
                     }
                 }
             }
@@ -102,5 +100,27 @@ public class LevelGenerator : MonoBehaviour {
             100,
             startZ
         );
+    }
+
+    private Bounds CalculateLocalBounds( GameObject parent )
+    {
+        // First find a center for your bounds.
+        Vector3 center = Vector3.zero;
+
+        foreach (Transform child in parent.transform)
+        {
+            center += child.gameObject.GetComponent<Renderer>().bounds.center;
+        }
+        center /= parent.transform.childCount; //center is average center of children
+
+        //Now you have a center, calculate the bounds by creating a zero sized 'Bounds', 
+        Bounds bounds = new Bounds(center, Vector3.zero);
+
+        foreach (Transform child in parent.transform)
+        {
+            bounds.Encapsulate(child.gameObject.GetComponent<Renderer>().bounds);
+        }
+
+        return bounds;
     }
 }

@@ -19,6 +19,6 @@ public class _DevPreload : MonoBehaviour {
         GameObject preloadedApp = GameObject.Find("__app");
         LevelGenerator l = preloadedApp.GetComponent<LevelGenerator>();
 
-        l.GenerateLevel();
+        l.GenerateLevel(9, 8);
     }
 }

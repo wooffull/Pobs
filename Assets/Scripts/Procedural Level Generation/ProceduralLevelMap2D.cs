@@ -4,23 +4,32 @@ using UnityEngine;
 using UnityEngine.Assertions;
 
 public class ProceduralLevelMap2D : Map2D {
-    private const int MAX_CYCLE_COUNT = 2;
-    private const float DEFAULT_CONNECTION_PERCENTAGE = 0.3f;
-    private const float CONTINUE_CONNECTION_SEARCH_PERCENTAGE = 0.9f;
-    private const float CONNECT_CYCLE_PERCENTAGE = 0.005f;
+    private const int MAX_CYCLE_COUNT = 3;
+    private const float DEFAULT_FILL_PERCENTAGE = 0.35294117647f;
+    private const float CONTINUE_CONNECTION_SEARCH_PERCENTAGE = 0.95f;
+    private const float CONNECT_CYCLE_PERCENTAGE = 0.1f;
 
+    private List<Map2DNode> activeNodes;
     private int[][] adjacencyMatrix;
     private bool[][] cycleMatrix;
     private uint cycleCount;
 
-    public ProceduralLevelMap2D(uint horizontalNodes, uint verticalNodes, float connectionPercentage = DEFAULT_CONNECTION_PERCENTAGE)
+    public ProceduralLevelMap2D(uint horizontalNodes, uint verticalNodes, float connectionPercentage = DEFAULT_FILL_PERCENTAGE)
         : base(horizontalNodes, verticalNodes)
     {
         uint totalNodes = horizontalNodes * verticalNodes;
 
         // Seed random
-        Random.InitState(System.DateTime.Now.Millisecond);
+        System.DateTime epochStart = new System.DateTime(1970, 1, 1, 0, 0, 0, System.DateTimeKind.Utc);
+        int elapsedSeconds = (int)(System.DateTime.UtcNow - epochStart).TotalSeconds;
+        // Seed == 1498861726 : 3 cycles
+        // Seed == 1498863788 : 1 cycle
+        // Seed == 1498863869 : 1 medium cycle
+        // Seed == 1498863869 : 2 cycles (medium + small)
+        Random.InitState(elapsedSeconds);
+        Debug.Log("Seed: " + elapsedSeconds.ToString());
 
+        activeNodes = new List<Map2DNode>();
         adjacencyMatrix = new int[totalNodes][];
         cycleMatrix = new bool[totalNodes][];
         cycleCount = 0;
@@ -55,6 +64,7 @@ public class ProceduralLevelMap2D : Map2D {
             AddConnection();
             connectionsNeeded--;
         }
+        Debug.Log(cycleCount);
     }
 
     public void AddConnection()
@@ -66,19 +76,24 @@ public class ProceduralLevelMap2D : Map2D {
         {
             StartNode = Nodes[HorizontalLength / 2][VerticalLength / 2];
             StartNode.Active = true;
+            activeNodes.Add(StartNode);
             //StartNode.Data = new MapNodeData(5, 5, 5);
             return;
         }
-        
+
         bool connectionAdded = false;
-        Stack<Map2DNode> nodeStack = new Stack<Map2DNode>();
         Map2DNode searchNode;
+        Stack<Map2DNode> nodeStack = new Stack<Map2DNode>();
         List<Map2DNode> adjacentNodes;
         List<Map2DNode> connectedUnvistedNodes;
         List<Map2DNode> availableNodes;
 
         ResetNodes();
-        nodeStack.Push(StartNode);
+
+        // Select a random active node
+        int randomNodeIndex = Random.Range(0, activeNodes.Count);
+        searchNode = activeNodes[randomNodeIndex];
+        nodeStack.Push(searchNode);
 
         // Search for and decide on a place to make the connection
         while (connectionAdded == false)
@@ -98,7 +113,7 @@ public class ProceduralLevelMap2D : Map2D {
             bool useNext =
                 connectedUnvistedNodes.Count > 0 &&
                 (availableNodes.Count == 0 ||
-                Random.Range(0.0f, 1.0f) <= CONTINUE_CONNECTION_SEARCH_PERCENTAGE);
+                Random.value <= CONTINUE_CONNECTION_SEARCH_PERCENTAGE);
 
             // By chance, move to an already-connected node to try to make the new connection off that one
             if (useNext)
@@ -119,7 +134,7 @@ public class ProceduralLevelMap2D : Map2D {
                     !createsCycle ||
                     (createsCycle &&
                     cycleCount < MAX_CYCLE_COUNT &&
-                    Random.Range(0.0f, 1.0f) <= CONNECT_CYCLE_PERCENTAGE);
+                    Random.value <= CONNECT_CYCLE_PERCENTAGE);
 
                 if (canCreate)
                 {
@@ -139,6 +154,7 @@ public class ProceduralLevelMap2D : Map2D {
                     }
 
                     connectionAdded = true;
+                    activeNodes.Add(searchNode);
                     continue;
                 }
             }
@@ -153,7 +169,11 @@ public class ProceduralLevelMap2D : Map2D {
             // (Dead end!) Retry the whole process...
             ResetNodes();
             nodeStack.Clear();
-            nodeStack.Push(StartNode);
+
+            // Select a random active node
+            randomNodeIndex = Random.Range(0, activeNodes.Count);
+            searchNode = activeNodes[randomNodeIndex];
+            nodeStack.Push(searchNode);
         }
     }
 
