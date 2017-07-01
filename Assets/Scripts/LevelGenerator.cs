@@ -39,7 +39,7 @@ public class LevelGenerator : MonoBehaviour {
 
     public void GenerateLevel(uint horizontalNodeLength = 25, uint verticalNodeLength = 25)
     {
-        ProceduralLevelMap2D map = new ProceduralLevelMap2D(horizontalNodeLength, verticalNodeLength);
+        ProceduralLevelMap2D map = new ProceduralLevelMap2D(5, 5);
 
         Bounds bounds = CalculateLocalBounds((GameObject)platformPrefab);
         float nodeDistance = bounds.size.x * 1.2f;

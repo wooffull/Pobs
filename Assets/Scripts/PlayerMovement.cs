@@ -17,22 +17,38 @@ public class PlayerMovement : MonoBehaviour {
     private Vector3 impulse = Vector3.zero;
     private bool canJump = false;
     private int jumpTimer = 0;
-
+    
 	// Use this for initialization
 	void Start()
     {
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         characterController = GetComponent<CharacterController>();
     }
-	
-	// FixedUpdate is called on a reliable timer, independent of frame rate
-	void FixedUpdate()
+
+    // FixedUpdate is called on a reliable timer, independent of frame rate
+    void FixedUpdate()
     {
         float hAxis = Input.GetAxis("Horizontal");
         float vAxis = Input.GetAxis("Vertical");
 
-        characterController.SimpleMove(transform.forward * vAxis * walkSpeed);
-        transform.Rotate(Vector3.up * turnSpeed * hAxis, Space.World);
+        if (hAxis != 0 || vAxis != 0)
+        {
+            Vector3 camProjectedForward = new Vector3(cam.transform.forward.x, 0, cam.transform.forward.z).normalized;
+
+            Vector3 direction = new Vector3(hAxis, 0, vAxis).normalized;
+            float offsetAngle = Vector3.Angle(Vector3.forward, camProjectedForward);
+
+            if (Vector3.Dot(camProjectedForward, Vector3.right) < 0)
+            {
+                offsetAngle *= -1;
+            }
+
+            direction = Quaternion.Euler(0, offsetAngle, 0) * direction;
+
+            transform.rotation = Quaternion.LookRotation(direction);
+        }
+
+        characterController.SimpleMove((cam.transform.forward * vAxis + cam.transform.right * hAxis) * walkSpeed);
 
         SnapToRamp();
         UpdateJump();
