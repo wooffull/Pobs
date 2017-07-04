@@ -9,6 +9,23 @@ public class LevelGenerator : MonoBehaviour {
     [SerializeField]
     private Object bridgePrefab;
 
+    private NodeManager nodeManager;
+
+    void Start()
+    {
+        GameObject preloadedApp = GameObject.Find("__app");
+        nodeManager = preloadedApp.GetComponent<NodeManager>();
+    }
+
+    public object CreateNode(float x, float y, float z)
+    {
+        return Instantiate(
+            nodeManager.GetNode(),
+            new Vector3(x, y, z),
+            Quaternion.identity
+        );
+    }
+
     public object CreatePlatform(float x, float y, float z)
     {
         return Instantiate(
@@ -39,7 +56,7 @@ public class LevelGenerator : MonoBehaviour {
 
     public void GenerateLevel(uint horizontalNodeLength = 25, uint verticalNodeLength = 25)
     {
-        ProceduralLevelMap2D map = new ProceduralLevelMap2D(5, 5);
+        ProceduralLevelMap2D map = new ProceduralLevelMap2D(horizontalNodeLength, verticalNodeLength);
 
         Bounds bounds = CalculateLocalBounds((GameObject)platformPrefab);
         float nodeDistance = bounds.size.x * 1.2f;
@@ -59,7 +76,7 @@ public class LevelGenerator : MonoBehaviour {
 
                 if (n.Active)
                 {
-                    CreatePlatform(x, 0, z);
+                    CreateNode(x, 0, z);
 
                     if (n.ConnectedWithDown)
                     {

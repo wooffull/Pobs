@@ -48,7 +48,15 @@ public class PlayerMovement : MonoBehaviour {
             // If the collision was below the player, the player is grounded
             if (Vector3.Dot(contact.normal, Vector3.up) > 0.5f)
             {
-                collidedGroundObjects.Add(c.gameObject);
+                if (c.gameObject.tag == "Enemy")
+                {
+                    Destroy(c.gameObject);
+                }
+                else
+                {
+                    collidedGroundObjects.Add(c.gameObject);
+                }
+
                 isGrounded = true;
             }
         }
