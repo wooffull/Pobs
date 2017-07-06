@@ -17,30 +17,30 @@ Platform assembly: C:\Users\Public\Documents\Unity Projects\Pobs\Test_Data\Manag
 Loading C:\Users\Public\Documents\Unity Projects\Pobs\Test_Data\Managed\UnityEngine.Networking.dll into Unity Child Domain
 Platform assembly: C:\Users\Public\Documents\Unity Projects\Pobs\Test_Data\Managed\UnityEngine.Analytics.dll (this message is harmless)
 Loading C:\Users\Public\Documents\Unity Projects\Pobs\Test_Data\Managed\UnityEngine.Analytics.dll into Unity Child Domain
-- Completed reload, in  0.029 seconds
+- Completed reload, in  0.024 seconds
 Platform assembly: C:\Users\Public\Documents\Unity Projects\Pobs\Test_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: C:\Users\Public\Documents\Unity Projects\Pobs\Test_Data\Managed\System.dll (this message is harmless)
 desktop: 1600x900 60Hz; virtual: 2880x1024 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 <RI> Initialized touch support.
-UnloadTime: 1.333089 ms
+UnloadTime: 1.690023 ms
 Unloading 6 Unused Serialized files (Serialized files now loaded: 0)
 Setting up 4 worker threads for Enlighten.
-  Thread -> id: 4928 -> priority: 1 
-  Thread -> id: 2524 -> priority: 1 
-  Thread -> id: 4e3c -> priority: 1 
-  Thread -> id: 4314 -> priority: 1 
-UnloadTime: 0.260003 ms
+  Thread -> id: 401c -> priority: 1 
+  Thread -> id: 4338 -> priority: 1 
+  Thread -> id: 6bd8 -> priority: 1 
+  Thread -> id: 459c -> priority: 1 
+UnloadTime: 0.265705 ms
 
-Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 285.
-Total: 4.948432 ms (FindLiveObjects: 0.027368 ms CreateObjectMapping: 0.017485 ms MarkObjects: 4.892174 ms  DeleteObjects: 0.010643 ms)
+Unloading 5 unused Assets to reduce memory usage. Loaded Objects now: 473.
+Total: 9.406887 ms (FindLiveObjects: 0.037251 ms CreateObjectMapping: 0.031550 ms MarkObjects: 9.322500 ms  DeleteObjects: 0.015204 ms)
 
-Seed: 1498882623
+Seed: 1499317873
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 
-0
+1
  
 (Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/DebugBindings.gen.cpp Line: 51)
 

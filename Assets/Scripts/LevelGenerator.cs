@@ -3,11 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class LevelGenerator : MonoBehaviour {
+    public float nodeSeparationMultiplier = 1.5f;
+
     [SerializeField]
     private Object platformPrefab;
 
     [SerializeField]
     private Object bridgePrefab;
+
+    [SerializeField]
+    private Object nodeWallPrefab;
 
     private NodeManager nodeManager;
 
@@ -19,11 +24,25 @@ public class LevelGenerator : MonoBehaviour {
 
     public object CreateNode(float x, float y, float z)
     {
-        return Instantiate(
+        GameObject nodeWallObject = (GameObject)Instantiate(
+            nodeWallPrefab,
+            new Vector3(x, y, z),
+            Quaternion.identity
+        );
+        GameObject node = (GameObject)Instantiate(
             nodeManager.GetNode(),
             new Vector3(x, y, z),
             Quaternion.identity
         );
+
+        NodeWall nodeWall = node.AddComponent<NodeWall>();
+        nodeWall.NodeWallObject = nodeWallObject;
+
+        RoomNode roomNode = node.AddComponent<RoomNode>();
+        roomNode.Wall = nodeWall;
+        nodeWall.RoomNode = roomNode;
+
+        return node;
     }
 
     public object CreatePlatform(float x, float y, float z)
@@ -57,9 +76,14 @@ public class LevelGenerator : MonoBehaviour {
     public void GenerateLevel(uint horizontalNodeLength = 25, uint verticalNodeLength = 25)
     {
         ProceduralLevelMap2D map = new ProceduralLevelMap2D(horizontalNodeLength, verticalNodeLength);
+        AddMapToWorld(map);
+        LinkRoomNeighbors(map);
+    }
 
+    private void AddMapToWorld(Map2D map)
+    {
         Bounds bounds = CalculateLocalBounds((GameObject)platformPrefab);
-        float nodeDistance = bounds.size.x * 1.2f;
+        float nodeDistance = bounds.size.x * nodeSeparationMultiplier;
         float bridgeOffsetY = -7;
 
         for (int i = 0; i < map.HorizontalLength; i++)
@@ -76,7 +100,7 @@ public class LevelGenerator : MonoBehaviour {
 
                 if (n.Active)
                 {
-                    CreateNode(x, 0, z);
+                    n.GameObject = (GameObject)CreateNode(x, 0, z);
 
                     if (n.ConnectedWithDown)
                     {
@@ -104,6 +128,7 @@ public class LevelGenerator : MonoBehaviour {
             }
         }
 
+        // Add player to the world after everything's been added
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         float startX = map.StartNode.X * nodeDistance;
         float startZ = map.StartNode.Y * nodeDistance;
@@ -117,6 +142,28 @@ public class LevelGenerator : MonoBehaviour {
             100,
             startZ
         );
+    }
+
+    private void LinkRoomNeighbors(Map2D map)
+    {
+        for (int i = 0; i < map.HorizontalLength; i++)
+        {
+            for (int j = 0; j < map.VerticalLength; j++)
+            {
+                Map2DNode n = map.Nodes[i][j];
+
+                if (n.GameObject != null)
+                {
+                    RoomNode roomNode = n.GameObject.GetComponent<RoomNode>();
+
+                    foreach (Map2DNode neighbor in n.ConnectedNodes)
+                    {
+                        RoomNode neighborRoomNode = neighbor.GameObject.GetComponent<RoomNode>();
+                        roomNode.Neighbors.Add(neighborRoomNode);
+                    }
+                }
+            }
+        }
     }
 
     private Bounds CalculateLocalBounds( GameObject parent )

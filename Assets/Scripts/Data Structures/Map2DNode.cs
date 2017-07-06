@@ -12,6 +12,7 @@ public class Map2DNode {
     public uint Y { get; set; }
     public uint Id { get; set; }
     public MapNodeData Data { get; set; }
+    public GameObject GameObject { get; set; }
     public bool Visited { get; set; }
     public bool Active { get; set; }
     public bool ConnectedWithLeft { get { return connectedWithLeft; } }
@@ -81,6 +82,7 @@ public class Map2DNode {
         Y = y;
         Id = id;
         Data = null;
+        GameObject = null;
         Active = false;
         connectedWithLeft = false;
         connectedWithRight = false;

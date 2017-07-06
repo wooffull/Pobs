@@ -39,6 +39,11 @@ public class PlayerMovement : MonoBehaviour {
         rigidBody.MovePosition(displacement + transform.position);
     }
 
+    void OnCollisionEnter(Collision c)
+    {
+        OnCollisionStay(c);
+    }
+
     void OnCollisionStay(Collision c)
     {
         if (c.contacts.Length > 0)
@@ -48,16 +53,28 @@ public class PlayerMovement : MonoBehaviour {
             // If the collision was below the player, the player is grounded
             if (Vector3.Dot(contact.normal, Vector3.up) > 0.5f)
             {
+                ResetJump();
+
+                // If jumping on an enemy, hop off of it
                 if (c.gameObject.tag == "Enemy")
                 {
-                    Destroy(c.gameObject);
-                }
-                else
-                {
-                    collidedGroundObjects.Add(c.gameObject);
+                    float hop = CalculateJumpIncrement(0, totalJumpTime * 0.5f);
+
+                    rigidBody.velocity = new Vector3
+                    (
+                        rigidBody.velocity.x,
+                        hop,
+                        rigidBody.velocity.z
+                    );
+                    isGrounded = false;
                 }
 
-                isGrounded = true;
+                // Otherwise, keep track of the object below the player
+                else
+                {
+                    isGrounded = true;
+                    collidedGroundObjects.Add(c.gameObject);
+                }
             }
         }
     }
