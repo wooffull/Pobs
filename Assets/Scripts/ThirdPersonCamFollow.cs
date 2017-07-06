@@ -6,8 +6,8 @@ using System;
 public class ThirdPersonCamFollow : MonoBehaviour {
     public Vector3 offsetPosition;
     
-    public float horizontalTurnSpeed = 1;
-    public float verticalTurnSpeed = 1;
+    public float horizontalTurnSpeed = 90;
+    public float verticalTurnSpeed = 90;
 
     public float minVerticalAngle = 20;
     public float maxVerticalAngle = 60;
@@ -34,8 +34,8 @@ public class ThirdPersonCamFollow : MonoBehaviour {
         float vAxis = Input.GetAxis("VerticalCam");
         
         // Add rotation from the right analog stick
-        qX *= Quaternion.AngleAxis(hAxis * horizontalTurnSpeed, Vector3.up);
-        qY *= Quaternion.AngleAxis(vAxis * verticalTurnSpeed, Vector3.right);
+        qX *= Quaternion.AngleAxis(hAxis * horizontalTurnSpeed * Time.deltaTime, Vector3.up);
+        qY *= Quaternion.AngleAxis(vAxis * verticalTurnSpeed * Time.deltaTime, Vector3.right);
 
         // Clamp the vertical angle between its min and max
         float verticalAngle = Vector3.Angle(Vector3.up, (qX * qY) * offsetPosition);
