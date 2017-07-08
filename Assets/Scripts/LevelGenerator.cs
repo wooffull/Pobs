@@ -165,14 +165,22 @@ public class LevelGenerator : MonoBehaviour {
         }
 
         // Add player to the world after everything's been added
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
         float startX = map.StartNode.X * nodeDistance;
         float startZ = map.StartNode.Y * nodeDistance;
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
 
         if (map.StartNode.X % 2 == 0) startZ += nodeDistance * 2 * Mathf.Floor(map.StartNode.Y / 2);
         else startZ += nodeDistance * 2 * Mathf.Floor((map.StartNode.Y + 1) / 2) - nodeDistance;
 
         player.transform.position = new Vector3
+        (
+            startX,
+            100,
+            startZ
+        );
+
+        RespawnOnFall respawnComponent = player.GetComponent<RespawnOnFall>();
+        respawnComponent.RespawnPosition = new Vector3
         (
             startX,
             100,
