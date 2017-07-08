@@ -15,11 +15,13 @@ public class LevelGenerator : MonoBehaviour {
     private Object nodeWallPrefab;
 
     private NodeManager nodeManager;
+    private BridgeAccessoryManager bridgeAccessoryManager;
 
     void Start()
     {
         GameObject preloadedApp = GameObject.Find("__app");
         nodeManager = preloadedApp.GetComponent<NodeManager>();
+        bridgeAccessoryManager = preloadedApp.GetComponent<BridgeAccessoryManager>();
     }
 
     public object CreateNode(float x, float y, float z)
@@ -72,6 +74,30 @@ public class LevelGenerator : MonoBehaviour {
         return ret;
     }
 
+    public object CreateBridgeAccessory(object bridge)
+    {
+        GameObject bridgeGameObject = (GameObject)bridge;
+        Bounds bridgeBounds = CalculateLocalBounds(bridgeGameObject);
+
+        object ret = Instantiate(
+            bridgeAccessoryManager.GetBridgeAccessory(),
+            bridgeGameObject.transform.position,
+            Quaternion.AngleAxis(90, Vector3.up) * bridgeGameObject.transform.rotation
+        );
+
+        GameObject accessoryGameObject = (GameObject)ret;
+        Bounds accessoryBounds = CalculateLocalBounds(accessoryGameObject);
+
+        // Offset the center of the accessory so it lays on top of the bridge
+        accessoryGameObject.transform.position += new Vector3
+        (
+            0,
+            (bridgeBounds.size.y + bridgeBounds.size.y) * 0.5f,
+            0
+        );
+
+        return ret;
+    }
 
     public void GenerateLevel(uint horizontalNodeLength = 25, uint verticalNodeLength = 25)
     {
@@ -104,7 +130,12 @@ public class LevelGenerator : MonoBehaviour {
 
                     if (n.ConnectedWithDown)
                     {
-                        CreateBridge(x, bridgeOffsetY, z + nodeDistance * 0.5f, 0, nodeDistance);
+                        object bridge = CreateBridge(x, bridgeOffsetY, z + nodeDistance * 0.5f, 0, nodeDistance);
+
+                        if (Random.value < 0.25f)
+                        {
+                            CreateBridgeAccessory(bridge);
+                        }
                     }
 
                     if (n.ConnectedWithRight)
@@ -122,7 +153,12 @@ public class LevelGenerator : MonoBehaviour {
                         Vector3 direction = nextPos - curPos;
                         float angle = Mathf.Atan2(direction.z, direction.x) * Mathf.Rad2Deg;
 
-                        CreateBridge(bridgeX, bridgeOffsetY, bridgeZ, angle, nodeDistance * Mathf.Sqrt(2));
+                        object bridge = CreateBridge(bridgeX, bridgeOffsetY, bridgeZ, angle, nodeDistance * Mathf.Sqrt(2));
+                        
+                        if (Random.value < 0.25f)
+                        {
+                            CreateBridgeAccessory(bridge);
+                        }
                     }
                 }
             }
@@ -173,7 +209,12 @@ public class LevelGenerator : MonoBehaviour {
 
         foreach (Transform child in parent.transform)
         {
-            center += child.gameObject.GetComponent<Renderer>().bounds.center;
+            Renderer childRenderer = child.gameObject.GetComponent<Renderer>();
+
+            if (childRenderer != null)
+            {
+                center += childRenderer.bounds.center;
+            }
         }
         center /= parent.transform.childCount; //center is average center of children
 
@@ -182,7 +223,12 @@ public class LevelGenerator : MonoBehaviour {
 
         foreach (Transform child in parent.transform)
         {
-            bounds.Encapsulate(child.gameObject.GetComponent<Renderer>().bounds);
+            Renderer childRenderer = child.gameObject.GetComponent<Renderer>();
+
+            if (childRenderer != null)
+            {
+                bounds.Encapsulate(childRenderer.bounds);
+            }
         }
 
         return bounds;
